@@ -1,0 +1,79 @@
+.\" Copyright (c) 2026 Armin Shirazi
+.\"
+.\" SPDX-License-Identifier: BSD-3-Clause
+.Dd October 11, 2026
+.Dt ASDO 1
+.Os
+.Sh NAME
+.Nm asdo
+.Nd Privilege escalation utility
+.Sh SYNOPSIS
+.Nm
+.Op Fl e
+.Op Fl s
+.Op Fl u Ar user
+.Op Fl a Ar user Ns / Ns Ar group
+.Ar command Op Ar args
+.Sh DESCRIPTION
+.Nm
+can leverage
+.Xr mdo 1
+on
+.Fx 15.0
+or later to escalate privileges with proper authentication.
+.Xr mac_do 4
+manages authorization while
+.Xr su 1
+manages authentication.
+.Pp
+To use
+.Nm
+add a new user with its username ending in
+.Qq _do
+and set a secure password for it.
+Then write the desired
+.Xr mac_do 4
+rules for the new user's uid.
+Test that the rules work as expected and make them permanent by writing them to
+.Pa /etc/sysctl.conf .
+.Sh OPTIONS
+The following options are available:
+.Bl -tag -width Ds
+.It Fl e
+This option keeps the environment variables and working directory intact.
+.It Fl s
+This option simulates a fresh login, discarding both
+the environment variables and working directory.
+.It Fl u Ar user
+Specifies the user to run the command as, defaults to root.
+.It Fl a Ar user Ns / Ns Ar group
+Specifies the user to authenticate against (without the
+.Qq _do
+suffix), defaults to your username and
+the name of your groups as a fallback.
+.El
+.Pp
+The
+.Fl e
+and
+.Fl s
+options are mutually exclusive, the last one specified takes precedence.
+.Pp
+Default behaviour discards environment variables and creates
+a minimal set, while keeping the working directory intact.
+.Sh EXIT STATUS
+.Nm
+exits with 1 on any errors, 0 otherwise.
+.Pp
+Due to architectural limitations,
+.Nm
+cannot determine the exact exit status of the executed command
+and only detects if it is zero or non-zero.
+A non-zero exit status is considered an error.
+.Sh SEE ALSO
+.Xr mdo 1 ,
+.Xr su 1 ,
+.Xr mac_do 4 ,
+.Xr sysctl.conf 5
+.Sh AUTHORS
+.An Armin Shirazi Aq Mt sharmeanix@tutamail.com
