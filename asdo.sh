@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #  Copyright (c) 2026 Armin Shirazi
- 
+#
 #  SPDX-License-Identifier: BSD-3-Clause
 
 # 1. Add a new user with the suffix of _do and set a password for it.
@@ -32,11 +32,11 @@ auth () {
 env "$envopt" $env_user su -m "$auth_user" <<EOF
 mdo -u "$user" -g "$group" su "$suopt" "$user" -c '
 	printf %s "$args" | base64 -d |
-		xargs -0o env "$envopt2" $env_user2 command' ||
+		xargs -0o env "$envopt2" $env_user2 "$userenv" "$termenv" command' ||
 			return 3
 EOF
 retval=$?
-[ $retval -eq 0 ] || auth $(($1 - (1 \* $retval)))
+[ $retval -eq 0 ] || auth $(($1 - $retval))
 }
 
 PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
@@ -81,10 +81,15 @@ if [ -z "$auth_user" ]; then
 	fi
 fi
 
-if [ "$envopt" != "--" ]; then env_user="$user";
-elif [ "$suopt" != "-l" ]; then env_user2="$user" && envopt2="-U"; fi
+termenv="_asdo_placeholder_="
+userenv="_asdo_placeholder_="
 
-[ ! -z "$env_user" ] && [ $(id -u "$env_user") -eq 0 ] && env_user="$env_user USER=$env_user"
+if [ "$envopt" != "--" ]; then env_user="$user";
+	[ "$suopt" != "-l" ] && env_user2="$user" && envopt2="-U"
+	[ ! -z "$TERM" ] && infocmp >/dev/null 2>&1 && termenv="TERM=$TERM"
+fi
+
+[ ! -z "$env_user" ] && userenv="USER=$env_user"
 
 group=$(id -gn "$user") || exit 1
 
