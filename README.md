@@ -40,20 +40,15 @@ When you feel confident enough, continue reading.
 
 ## Installation
 
-Download the script and run the following as root:
+To install asdo and its manual page:
+
 ```sh
-install -o 0 -g 0 -m 555 /path/to/script /usr/local/bin/asdo
+install -o 0 -g 0 -m 555 asdo.sh /usr/local/bin/asdo
+gzip -c asdo.1 >> asdo.1.gz
+install -o 0 -g 0 -m 644 asdo.1.gz /usr/local/share/man/man1
 ```
 
-### Replace /path/to/script with the path to the script.
-
-To install the man page as well:
-```sh
-gzip /path/to/asdo.1
-install -o 0 -g 0 -m 644 /path/to/asdo.1.gz /usr/local/share/man/man1
-```
-
-### Replace /path/to/asdo.1 with the appropriate path.
+**Note:** The install commands require root privileges.
 
 ## Usage
 
